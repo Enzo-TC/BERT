@@ -1,0 +1,30 @@
+
+@squid:S1643ñ"Use a StringBuilder instead.(»Å’Ãøÿÿÿÿ8ğ¡ïğÌ.
+@squid:S1643ï"Use a StringBuilder instead.(×à¬Ûÿÿÿÿÿ8ğ¡ïğÌ.
+|squid:S2293&"YReplace the type specification in this constructor call with the diamond operator ("<>").(ìöéßÿÿÿÿÿ8ğ¡ïğÌ.
+wsquid:S2293%"YReplace the type specification in this constructor call with the diamond operator ("<>").(öëá™8ğ¡ïğÌ.
+\"squid:SwitchLastCaseIsDefaultCheck""Add a default case to this switch.(ªã€Èıÿÿÿÿ8ğ¡ïğÌ.
+[
+squid:S106g"9Replace this use of System.out or System.err by a logger.(¨¶ÑÍşÿÿÿÿ8ğ¡ïğÌ.
+^
+squid:S899È";Do something with the "boolean" value returned by "delete".(Ö«Ò²ùÿÿÿÿ8ğ¡ïğÌ.
+X"squid:SwitchLastCaseIsDefaultCheckİ""Add a default case to this switch.(±àø±8ğ¡ïğÌ.
+\
+squid:S106Ê"9Replace this use of System.out or System.err by a logger.(Ñş²Šıÿÿÿÿ8ğ¡ïğÌ.
+\
+squid:S106Ø"9Replace this use of System.out or System.err by a logger.(ëÒÈÉúÿÿÿÿ8ğ¡ïğÌ.
+msquid:S4042È"IUse "java.nio.Files#delete" here for better messages on error conditions.(Ö«Ò²ùÿÿÿÿ8ğ¡ïğÌ.
+lsquid:S1192€"HDefine a constant instead of duplicating this literal "ARTISTS" 3 times.(Âöùãøÿÿÿÿ8ğ¡ïğÌ.
+msquid:S4042Ê"IUse "java.nio.Files#delete" here for better messages on error conditions.(Ñş²Šıÿÿÿÿ8ğ¡ïğÌ.
+[
+squid:S106["9Replace this use of System.out or System.err by a logger.(¨¶ÑÍşÿÿÿÿ8ğ¡ïğÌ.
+csquid:S2147h"ECombine this catch with the one at line 102, which has the same body.(ï­£Ä8ğ¡ïğÌ.
+†squid:S4087Ö"bRemove this "close" call; closing the resource is handled automatically by the try-with-resources.(ÄËªŸÿÿÿÿÿ8ğ¡ïğÌ.
+[
+squid:S106i"9Replace this use of System.out or System.err by a logger.(¨¶ÑÍşÿÿÿÿ8ğ¡ïğÌ.
+W"squid:SwitchLastCaseIsDefaultCheckD""Add a default case to this switch.(öÚ–Û8ğ¡ïğÌ.
+wsquid:S2293'"YReplace the type specification in this constructor call with the diamond operator ("<>").(Ì†·8ğ¡ïğÌ.
+jsquid:S1192„"FDefine a constant instead of duplicating this literal "LINKS" 3 times.(Ôù©¿üÿÿÿÿ8ğ¡ïğÌ.
+‘squid:S1319ë"rThe type of the "tags" object should be an interface such as "SortedSet" rather than the implementation "TreeSet".(Ñ¡‹8ğ¡ïğÌ.
+]"squid:SwitchLastCaseIsDefaultCheck˜""Add a default case to this switch.(ªã€Èıÿÿÿÿ8ğ¡ïğÌ.
+wsquid:S2293$"YReplace the type specification in this constructor call with the diamond operator ("<>").(®ëˆø8ğ¡ïğÌ.

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-javadoc.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-sources.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-tests.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-test-sources.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-csv-1.8/commons-csv-1.8.jar" />
+    <libelement value="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-csv-1.8/commons-csv-1.8-sources.jar" />
+    <conelement value="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER" level="application" />
+    <orderEntry type="module-library">
+      <library name="commons-io-2.8.0.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.8.0-javadoc.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-javadoc.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.8.0-sources.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-sources.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.8.0-tests.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-tests.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.8.0-test-sources.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-io-2.8.0/commons-io-2.8.0-test-sources.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-csv-1.8.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-csv-1.8/commons-csv-1.8.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-csv-1.8-sources.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Camilletti/Codes/JCodes/Sina Sees/lib/commons-csv-1.8/commons-csv-1.8-sources.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="commons-csv-1" level="project" />
+    <orderEntry type="library" name="commons-io-2.8" level="project" />
+  </component>
+</module>

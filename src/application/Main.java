@@ -26,10 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 public class Main extends Application{
 
 	public ArrayList<Art> allArt=new ArrayList<Art>();
+	//There was an issue with random Buttons other than link disappearing when trying to remove a link button
+	//By pairing each link button with it's link the program can filter the buttons that are going to be removed
+	private LinkedHashMap<String, Button> linkButtonsMap = new LinkedHashMap<>();
 	
 	public void start(Stage stage) throws FileNotFoundException{
 		//Adding art
@@ -191,165 +195,19 @@ public class Main extends Application{
 	
 	//Main detailed page
 	public void bigImage(Stage stage, Art art){
-		//New window
-		Pane newPane=new Pane();
-		//Getting the image itself
-		Image image = art.getImage();
-		//Image file is supported
-		if(image!=null){
-			ImageView imView=new ImageView(image);
-			
-			//Positioning the image
-			imView.setPreserveRatio(true);  
-			imView.setFitWidth(1000); 
-			imView.setFitHeight(800);
-			imView.setLayoutX(0);
-			imView.setLayoutX(0);
-			
-			//Returning image
-			newPane.getChildren().add(imView);
-		//Image file isn't supported
-		}else{
-			//Error text
-			Text imageError=new Text("It seems this file type isn't supported.\nPlease spam EnzoTC#2358 with this message and your image.");
-			imageError.setX(350);
-			imageError.setY(380);
-			newPane.getChildren().add(imageError);
-		}
-		
-		//Getting the tags for the image
-		Text artists=new Text("Artist(s):\n"+art.displayTags("ARTISTS"));
-		artists.setX(1020);
-		artists.setY(20);
-		
-		Text links=new Text("Link(s):\n");
-		links.setX(1020);
-		links.setY(60);
-		//Buttons for web links
-		newPane.getChildren().addAll(displayLinks(art));
-		
-		Text tags=new Text("Tags(s):\n"+art.displayTags("TAGS"));
-		tags.setX(1020);
-		tags.setY(140);
-		
-		Text meta=new Text("Meta:\n"+art.displayTags("META"));
-		meta.setX(1020);
-		meta.setY(180);
-		
-		//Returning tags
-		newPane.getChildren().addAll(artists,links,tags,meta);
-		
-		//Setting up the drop-down menu for different tags
-		ChoiceBox<String> tagBox=new ChoiceBox<String>();
-		tagBox.getItems().addAll("Artists","Links","Tags","Meta");
-		tagBox.setValue("Tags");
-		tagBox.setLayoutX(1020);
-		tagBox.setLayoutY(700);
-		
-		//Setting up the drop-down menu for websites
-		ChoiceBox<String> webBox=new ChoiceBox<String>();
-		webBox.getItems().addAll("Deviant Art","E926","Fur Affinity","Inkbunny","SoFurry","Tumblr","Twitter","Weasyl");
-		webBox.setValue("Fur Affinity");
-		webBox.setLayoutX(1100);
-		webBox.setLayoutY(700);
-		
-		//Returning the drop-down
-		newPane.getChildren().addAll(tagBox,webBox);
-		
-		//Setting up the text field for tags
-		TextField tagField=new TextField("Enter tag(s) here");
-		tagField.setLayoutX(1020);
-		tagField.setLayoutY(730);
-		
-		//Setting up the add and remove buttons for tags
-		Button addBtn=new Button("Add");
-		addBtn.setLayoutX(1020);
-		addBtn.setLayoutY(760);
-		
-		Button removeBtn=new Button("Remove");
-		removeBtn.setLayoutX(1100);
-		removeBtn.setLayoutY(760);
-		
-		//Setting up the button for deleting an image
-		Button deleteBtn=new Button("Delete image");
-		deleteBtn.setLayoutX(1200);
-		deleteBtn.setLayoutY(760);
-		
-		//Returning the tag buttons and field
-		newPane.getChildren().addAll(tagField,addBtn,removeBtn,deleteBtn);
-		
 		//Creating new window
+		Stage newWindow=new Stage();
+		Pane newPane = getPaneForArt(art, newWindow);
 		Scene newScene=new Scene(newPane,1800,800);
 		newScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		
-		Stage newWindow=new Stage();
+
 		newWindow.setTitle(art.getArtName());
 		newWindow.setScene(newScene);
-		
+
 		newWindow.show();
-		
-		//When add button is pressed
-		addBtn.setOnAction(new EventHandler<ActionEvent>(){
-			@Override public void handle(ActionEvent e){
-				//Checking values aren't null or empty
-				if(!tagField.getCharacters().toString().equals("")){
-					//Data for adding
-					String section=(String) tagBox.getValue();
-					String[] addTags=tagField.getCharacters().toString().split(" ");
-					
-					//Adding tag
-					if(section.equals("Links")){
-						for(int n=0;n<addTags.length;n++){
-							addTags[n]="["+(String) webBox.getValue()+"]"+addTags[n];
-						}
-						System.out.println(Arrays.toString(addTags));
-					}
-					art.addTags(section, addTags);
-						
-					//Updating text
-					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
-					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
-					meta.setText("Meta:\n"+art.displayTags("META"));
-				}
-				//Clearing tag entry box
-				tagField.clear();
-			}
-		});
-		
-		//When remove button is pressed
-		removeBtn.setOnAction(new EventHandler<ActionEvent>(){
-			@Override public void handle(ActionEvent e){
-				//Checking values aren't null or empty
-				if(!tagField.getCharacters().toString().equals("")){
-					//Data for removing
-					String section=(String) tagBox.getValue();
-					String[] removeTags=tagField.getCharacters().toString().split(" ");
-					
-					//Removing tag
-					art.removeTags(section, removeTags);
-						
-					//Updating text
-					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
-					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
-					meta.setText("Meta:\n"+art.displayTags("META"));
-				}
-				//Clearing tag entry box
-				tagField.clear();
-			}
-		});
-		
-		//When delete button is pressed
-		deleteBtn.setOnAction(new EventHandler<ActionEvent>(){
-			@Override public void handle(ActionEvent e){
-				art.deleteImage();
-				allArt.remove(art);
-			}
-		});
 	}
 
-	public Button[] displayLinks(Art art){
+	public void setupButtonLinks(Art art){
 		//If links exist
 		if(!art.displayTags("LINKS").equals("")) {
 			String[] tags=art.displayTags("LINKS").split(",");
@@ -372,7 +230,7 @@ public class Main extends Application{
 					rtn[n].getStyleClass().add("link-button");
 					rtn[n].setLayoutX(1020+(80*n));
 					rtn[n].setLayoutY(75);
-					
+
 					rtn[n].setOnAction(new EventHandler<ActionEvent>(){
 						@Override public void handle(ActionEvent e){
 							System.out.println(sections[1]);
@@ -382,19 +240,219 @@ public class Main extends Application{
 							clipboard.setContents(stringSelection, null);
 						}
 					});
+					linkButtonsMap.put(tags[n], rtn[n]);
 				}catch(IOException e){
 					rtn[n]=new Button("");
+					linkButtonsMap.put(tags[n], rtn[n]);
 					System.out.println(e);
 				}
 			}
-			return(rtn);
 		}
-		//No links
-		Button[] r=new Button[0];
-		return(r);
 	}
 	
 	public static void main(String[] args){
 		launch(args);
+	}
+
+	//Seperating this part of the code as a function lets me call the code inside the function
+	//See -> how the page is updated in addBtn.setOnAction and removeBtn.setOnAction
+	public Pane getPaneForArt(Art art, Stage newWindow){
+		//New window
+		Pane newPane=new Pane();
+		//Getting the image itself
+		Image image = art.getImage();
+		//Image file is supported
+		if(image!=null){
+			ImageView imView=new ImageView(image);
+
+			//Positioning the image
+			imView.setPreserveRatio(true);
+			imView.setFitWidth(1000);
+			imView.setFitHeight(800);
+			imView.setLayoutX(0);
+			imView.setLayoutX(0);
+
+			//Returning image
+			newPane.getChildren().add(imView);
+			//Image file isn't supported
+		}else{
+			//Error text
+			Text imageError=new Text("It seems this file type isn't supported.\nPlease spam EnzoTC#2358 with this message and your image.");
+			imageError.setX(350);
+			imageError.setY(380);
+			newPane.getChildren().add(imageError);
+		}
+
+		//Getting the tags for the image
+		Text artists=new Text("Artist(s):\n"+art.displayTags("ARTISTS"));
+		artists.setX(1020);
+		artists.setY(20);
+
+		Text links=new Text("Link(s):\n");
+		links.setX(1020);
+		links.setY(60);
+		//Buttons for web links
+		setupButtonLinks(art);
+		newPane.getChildren().addAll(linkButtonsMap.values());
+
+		Text tags=new Text("Tags(s):\n"+art.displayTags("TAGS"));
+		tags.setX(1020);
+		tags.setY(140);
+
+		Text meta=new Text("Meta:\n"+art.displayTags("META"));
+		meta.setX(1020);
+		meta.setY(180);
+
+		//Returning tags
+		newPane.getChildren().addAll(artists,links,tags,meta);
+
+		//Setting up the drop-down menu for different tags
+		ChoiceBox<String> tagBox=new ChoiceBox<String>();
+		tagBox.getItems().addAll("Artists","Links","Tags","Meta");
+		tagBox.setValue("Tags");
+		tagBox.setLayoutX(1020);
+		tagBox.setLayoutY(700);
+
+		//Setting up the drop-down menu for websites
+		ChoiceBox<String> webBox=new ChoiceBox<String>();
+		webBox.getItems().addAll("Deviant Art","E926","Fur Affinity","Inkbunny","SoFurry","Tumblr","Twitter","Weasyl");
+		webBox.setValue("Fur Affinity");
+		webBox.setLayoutX(1100);
+		webBox.setLayoutY(700);
+
+		//Returning the drop-down
+		newPane.getChildren().addAll(tagBox,webBox);
+
+		//Setting up the text field for tags
+		TextField tagField=new TextField("Enter tag(s) here");
+		tagField.setLayoutX(1020);
+		tagField.setLayoutY(730);
+
+		//Setting up the add and remove buttons for tags
+		Button addBtn=new Button("Add");
+		addBtn.setLayoutX(1020);
+		addBtn.setLayoutY(760);
+
+		Button removeBtn=new Button("Remove");
+		removeBtn.setLayoutX(1100);
+		removeBtn.setLayoutY(760);
+
+		//Setting up the button for deleting an image
+		Button deleteBtn=new Button("Delete image");
+		deleteBtn.setLayoutX(1200);
+		deleteBtn.setLayoutY(760);
+
+		//Returning the tag buttons and field
+		newPane.getChildren().addAll(tagField,addBtn,removeBtn,deleteBtn);
+
+		//When add button is pressed
+		addBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				//Checking values aren't null or empty
+				if(!tagField.getCharacters().toString().equals("")){
+					//Data for adding
+					String section=(String) tagBox.getValue();
+					String[] addTags=tagField.getCharacters().toString().split(" ");
+
+					//Adding tag
+					if(section.equals("Links")){
+						for(int n=0;n<addTags.length;n++){
+							addTags[n]="["+(String) webBox.getValue()+"]"+addTags[n];
+						}
+						System.out.println(Arrays.toString(addTags));
+						//Makes sure the tags are updated before updating the page
+						art.addTags(section, addTags);
+
+						//Adding link buttons
+
+						//Updates the Pairing map.
+						for(int n=0;n<addTags.length;n++) {
+							if (linkButtonsMap.keySet().contains(addTags[n])) {
+								//No need to add buttons in the for loop above because getPaneForArt takes care of it
+								linkButtonsMap.put(addTags[n], linkButtonsMap.get(addTags[n]));
+							}
+						}
+						//Letting bigImage make it's own Pane then trying to copy it in here would result in an IllegalArgumntException
+						//Because of some duplicating issue? idk
+						//Seperating the code that makes the pane then using it as a function to get a replica fixes the bug.
+						Pane p = getPaneForArt(art, newWindow);
+						//Now we can update the window without having to close and reopen it!
+						Scene newerScene=new Scene(p,1800,800);
+						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+						newWindow.setScene(newerScene);
+					}
+					//I put the second addTags in an else bracket to make sure no link tag is added twice
+					else{ art.addTags(section, addTags); }
+
+					//Updating text
+					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
+					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
+					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
+					meta.setText("Meta:\n"+art.displayTags("META"));
+				}
+				//Clearing tag entry box
+				tagField.clear();
+			}
+		});
+
+		//When remove button is pressed
+		removeBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				//Checking values aren't null or empty
+				if(!tagField.getCharacters().toString().equals("")){
+					//Data for removing
+					String section=(String) tagBox.getValue();
+					String[] removeTags=tagField.getCharacters().toString().split(" ");
+
+					//Removing tags
+					if(section.equals("Links")){
+						for(int n=0;n<removeTags.length;n++){
+							removeTags[n]="["+(String) webBox.getValue()+"]"+removeTags[n];
+						}
+						art.removeTags(section, removeTags);
+
+						//Removes Link buttons from the window
+
+						Pane p = getPaneForArt(art, newWindow);
+						//Updates the Pairing map.
+						for(int n=0;n<removeTags.length;n++) {
+							if (linkButtonsMap.keySet().contains(removeTags[n])) {
+								//getPaneForArt should remove the buttons but there was an issue
+								//Where i couldn't remove all the link buttons
+								//and one would always come back from the grave
+								//So this line is here as a fail-check to make sure they go away
+								//Like they should! *bonk*
+								p.getChildren().removeAll(linkButtonsMap.get(removeTags[n]));
+								linkButtonsMap.remove(removeTags[n], linkButtonsMap.get(removeTags[n]));
+							}
+						}
+						System.out.println(Arrays.toString(removeTags));
+						Scene newerScene=new Scene(p,1800,800);
+						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+						newWindow.setScene(newerScene);
+					}
+					else{ art.removeTags(section, removeTags);}
+
+					//Updating text
+					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
+					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
+					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
+					meta.setText("Meta:\n"+art.displayTags("META"));
+				}
+				//Clearing tag entry box
+				tagField.clear();
+			}
+		});
+
+		//When delete button is pressed
+		deleteBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				art.deleteImage();
+				allArt.remove(art);
+			}
+		});
+		return newPane;
 	}
 }

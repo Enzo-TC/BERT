@@ -199,7 +199,7 @@ public class Art {
 		File del=getTagFile();
 		del.delete();
 		del=getArtFile();
-		System.out.println(del.delete());
+		del.delete();
 	}
 	
 	//Writes the tags back to the CSV file
@@ -217,6 +217,7 @@ public class Art {
 		}
 	}
 	
+	//Returns formated tags for the section
 	public String displayTags(String section){
 		switch(section){
 		case("ARTISTS"):
@@ -231,7 +232,7 @@ public class Art {
 		return("");
 	}
 	
-	//Returns a nice looking list of tags in string form along with that to put between them
+	//Returns a nice looking list of tags in string form
 	public String formatTags(TreeSet<String> tags){
 		Iterator<String> tIterator=tags.iterator();
 		String rtn="";

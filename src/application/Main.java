@@ -6,6 +6,9 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
@@ -16,6 +19,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage; 
 
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.awt.Toolkit;
@@ -30,7 +34,7 @@ import java.util.LinkedHashMap;
 
 public class Main extends Application{
 
-	public ArrayList<Art> allArt=new ArrayList<Art>();
+	private ArrayList<Art> allArt=new ArrayList<Art>();
 	//There was an issue with random Buttons other than link disappearing when trying to remove a link button
 	//By pairing each link button with it's link the program can filter the buttons that are going to be removed
 	private LinkedHashMap<String, Button> linkButtonsMap = new LinkedHashMap<>();
@@ -79,11 +83,50 @@ public class Main extends Application{
 		//Returning buttons & field
 		layout.getChildren().addAll(tagsText,tagField,searchBtn,addBtn);
 		
+		
+		
+		//TODO: IMPLIMENT ME!!!
+		FileInputStream f=null;
+		ImageView fox=null;
+		try {
+			f=new FileInputStream("resource/LNK/Fur Affinity.png");
+			fox=new ImageView(new Image(f));
+			f.close();
+		}catch(FileNotFoundException e){}catch(IOException e){}
+		
+		VBox l=new VBox();
+		Button bTest=new Button("Copy");
+		Label tTest=new Label("WWW.OwO.com");
+		l.getChildren().addAll(tTest,bTest);
+		
+		MenuItem test=new MenuItem();
+		test.setGraphic(l);
+		
+		MenuButton test2=new MenuButton("",fox);
+		test2.getStyleClass().add("art-button");
+		test2.getItems().setAll(test);
+		test2.setLayoutX(50);
+		test2.setLayoutY(50);
+		layout.getChildren().add(test2);
+		
+		
+		
 		Scene scene = new Scene(layout, 240, 420);//Initializing scene
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		stage.setTitle("Sina");
 		stage.setScene(scene);
 		stage.show();
+		
+		
+		
+		bTest.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				System.out.println("Yeet");
+			}
+		});
+		
+		
+		
 		
 		//When search button is pressed
 		searchBtn.setOnAction(new EventHandler<ActionEvent>(){
@@ -207,6 +250,7 @@ public class Main extends Application{
 		newWindow.show();
 	}
 
+	//Adding link buttons to linkButtonsMap
 	public void setupButtonLinks(Art art){
 		//If links exist
 		if(!art.displayTags("LINKS").equals("")) {
@@ -233,11 +277,11 @@ public class Main extends Application{
 
 					rtn[n].setOnAction(new EventHandler<ActionEvent>(){
 						@Override public void handle(ActionEvent e){
-							System.out.println(sections[1]);
 							//Copying link to clipboard
 							StringSelection stringSelection=new StringSelection(sections[1]);
 							Clipboard clipboard=Toolkit.getDefaultToolkit().getSystemClipboard();
 							clipboard.setContents(stringSelection, null);
+							System.out.println("Copy");
 						}
 					});
 					linkButtonsMap.put(tags[n], rtn[n]);
@@ -294,7 +338,7 @@ public class Main extends Application{
 		//Buttons for web links
 		setupButtonLinks(art);
 		newPane.getChildren().addAll(linkButtonsMap.values());
-
+		
 		Text tags=new Text("Tags(s):\n"+art.displayTags("TAGS"));
 		tags.setX(1020);
 		tags.setY(140);
@@ -359,7 +403,6 @@ public class Main extends Application{
 						for(int n=0;n<addTags.length;n++){
 							addTags[n]="["+(String) webBox.getValue()+"]"+addTags[n];
 						}
-						System.out.println(Arrays.toString(addTags));
 						//Makes sure the tags are updated before updating the page
 						art.addTags(section, addTags);
 
@@ -387,7 +430,6 @@ public class Main extends Application{
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
 					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
 					meta.setText("Meta:\n"+art.displayTags("META"));
 				}
@@ -427,7 +469,6 @@ public class Main extends Application{
 								linkButtonsMap.remove(removeTags[n], linkButtonsMap.get(removeTags[n]));
 							}
 						}
-						System.out.println(Arrays.toString(removeTags));
 						Scene newerScene=new Scene(p,1800,800);
 						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
@@ -437,7 +478,6 @@ public class Main extends Application{
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
 					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
 					meta.setText("Meta:\n"+art.displayTags("META"));
 				}

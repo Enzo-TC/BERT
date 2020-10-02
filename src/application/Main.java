@@ -6,16 +6,19 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage; 
 
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.awt.Toolkit;
@@ -30,10 +33,10 @@ import java.util.LinkedHashMap;
 
 public class Main extends Application{
 
-	public ArrayList<Art> allArt=new ArrayList<Art>();
+	private ArrayList<Art> allArt=new ArrayList<Art>();
 	//There was an issue with random Buttons other than link disappearing when trying to remove a link button
 	//By pairing each link button with it's link the program can filter the buttons that are going to be removed
-	private LinkedHashMap<String, Button> linkButtonsMap = new LinkedHashMap<>();
+	
 	
 	public void start(Stage stage) throws FileNotFoundException{
 		//Adding art
@@ -77,7 +80,7 @@ public class Main extends Application{
 		//scrollPane.setContent();
 		
 		//Returning buttons & field
-		layout.getChildren().addAll(tagsText,tagField,searchBtn,addBtn);
+		layout.getChildren().addAll(tagsText,tagField,searchBtn,addBtn);		
 		
 		Scene scene = new Scene(layout, 240, 420);//Initializing scene
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -207,13 +210,17 @@ public class Main extends Application{
 		newWindow.show();
 	}
 
+	//Adding link buttons to linkButtonsMap
 	public void setupButtonLinks(Art art){
 		//If links exist
 		if(!art.displayTags("LINKS").equals("")) {
 			String[] tags=art.displayTags("LINKS").split(",");
 			//Buttons to return
-			Button[] rtn=new Button[tags.length];
+			MenuButton[] rtn=new MenuButton[tags.length];
 			for(int n=0;n<tags.length;n++){
+				Label link=new Label("");
+				VBox box;
+				MenuItem menuRtn;
 				try {
 					//Getting each tag
 					//sections is declared final so it can be used on button press
@@ -225,25 +232,34 @@ public class Main extends Application{
 					stream.close();
 					ImageView linkView=new ImageView(img);
 					
-					rtn[n]=new Button("",linkView);
-					rtn[n].setTooltip(new Tooltip(sections[1]));
+					//Setting up dropdown menu items
+					box=new VBox();
+					link.setText(sections[1]);
+					Button copyButton=new Button("Copy");
+					box.getChildren().addAll(link,copyButton);
+					menuRtn=new MenuItem();
+					menuRtn.setGraphic(box);
+					
+					rtn[n]=new MenuButton("",linkView);
 					rtn[n].getStyleClass().add("link-button");
 					rtn[n].setLayoutX(1020+(80*n));
 					rtn[n].setLayoutY(75);
+					rtn[n].getItems().setAll(menuRtn);
 
-					rtn[n].setOnAction(new EventHandler<ActionEvent>(){
+					//Pressing copy dropdown button
+					copyButton.setOnAction(new EventHandler<ActionEvent>(){
 						@Override public void handle(ActionEvent e){
-							System.out.println(sections[1]);
 							//Copying link to clipboard
 							StringSelection stringSelection=new StringSelection(sections[1]);
 							Clipboard clipboard=Toolkit.getDefaultToolkit().getSystemClipboard();
 							clipboard.setContents(stringSelection, null);
+							System.out.println(sections[1]);
 						}
 					});
-					linkButtonsMap.put(tags[n], rtn[n]);
+					art.putLink(tags[n], rtn[n]);
 				}catch(IOException e){
-					rtn[n]=new Button("");
-					linkButtonsMap.put(tags[n], rtn[n]);
+					rtn[n]=new MenuButton("");
+					art.putLink(tags[n], rtn[n]);
 					System.out.println(e);
 				}
 			}
@@ -293,8 +309,8 @@ public class Main extends Application{
 		links.setY(60);
 		//Buttons for web links
 		setupButtonLinks(art);
-		newPane.getChildren().addAll(linkButtonsMap.values());
-
+		newPane.getChildren().addAll(art.getLinkBtnMap().values());
+		
 		Text tags=new Text("Tags(s):\n"+art.displayTags("TAGS"));
 		tags.setX(1020);
 		tags.setY(140);
@@ -359,7 +375,6 @@ public class Main extends Application{
 						for(int n=0;n<addTags.length;n++){
 							addTags[n]="["+(String) webBox.getValue()+"]"+addTags[n];
 						}
-						System.out.println(Arrays.toString(addTags));
 						//Makes sure the tags are updated before updating the page
 						art.addTags(section, addTags);
 
@@ -367,9 +382,9 @@ public class Main extends Application{
 
 						//Updates the Pairing map.
 						for(int n=0;n<addTags.length;n++) {
-							if (linkButtonsMap.keySet().contains(addTags[n])) {
+							if (art.linkMapContains(addTags[n])) {
 								//No need to add buttons in the for loop above because getPaneForArt takes care of it
-								linkButtonsMap.put(addTags[n], linkButtonsMap.get(addTags[n]));
+								art.putLink(addTags[n], art.getLinkBtnMap().get(addTags[n]));
 							}
 						}
 						//Letting bigImage make it's own Pane then trying to copy it in here would result in an IllegalArgumntException
@@ -381,13 +396,13 @@ public class Main extends Application{
 						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
 						newWindow.setScene(newerScene);
+					}else{
+						//I put the second addTags in an else bracket to make sure no link tag is added twice
+						art.addTags(section, addTags); 
 					}
-					//I put the second addTags in an else bracket to make sure no link tag is added twice
-					else{ art.addTags(section, addTags); }
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
 					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
 					meta.setText("Meta:\n"+art.displayTags("META"));
 				}
@@ -417,17 +432,16 @@ public class Main extends Application{
 						Pane p = getPaneForArt(art, newWindow);
 						//Updates the Pairing map.
 						for(int n=0;n<removeTags.length;n++) {
-							if (linkButtonsMap.keySet().contains(removeTags[n])) {
+							if (art.linkMapContains(removeTags[n])) {
 								//getPaneForArt should remove the buttons but there was an issue
 								//Where i couldn't remove all the link buttons
 								//and one would always come back from the grave
 								//So this line is here as a fail-check to make sure they go away
 								//Like they should! *bonk*
-								p.getChildren().removeAll(linkButtonsMap.get(removeTags[n]));
-								linkButtonsMap.remove(removeTags[n], linkButtonsMap.get(removeTags[n]));
+								p.getChildren().removeAll(art.getLinkBtnMap().get(removeTags[n]));
+								art.removeLink(removeTags[n], art.getLinkBtnMap().get(removeTags[n]));
 							}
 						}
-						System.out.println(Arrays.toString(removeTags));
 						Scene newerScene=new Scene(p,1800,800);
 						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
@@ -437,7 +451,6 @@ public class Main extends Application{
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS"));
-					//links.setText("Link(s):\n"+art.displayTags("LINKS"));
 					tags.setText("Tags(s):\n"+art.displayTags("TAGS"));
 					meta.setText("Meta:\n"+art.displayTags("META"));
 				}

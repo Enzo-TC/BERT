@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.TreeSet;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 
 public class Art {
@@ -25,6 +28,8 @@ public class Art {
 	private TreeSet<String> linkTags;
 	private TreeSet<String> tagTags;
 	private TreeSet<String> metaTags;
+	
+	private LinkedHashMap<String, MenuButton> linkButtonsMap;
 	
 	public Art(File fl){
 		//Setting names
@@ -38,6 +43,8 @@ public class Art {
 		tagTags=new TreeSet<String>();
 		metaTags=new TreeSet<String>();
 		getTags();
+		
+		linkButtonsMap=new LinkedHashMap<>();
 	}
 	
 	public String getFileName(){
@@ -52,6 +59,9 @@ public class Art {
 		return(fileType);
 	}
 	
+	public LinkedHashMap<String, MenuButton> getLinkBtnMap(){
+		return(linkButtonsMap);
+	}
 	
 	//Returns a tree set of the tags in the art's 'section' file
 	public void getTags(){
@@ -194,6 +204,10 @@ public class Art {
 		return(false);
 	}
 	
+	public boolean linkMapContains(String tag){
+		return(linkButtonsMap.keySet().contains(tag));
+	}
+	
 	//Removes the image and files from 
 	public void deleteImage(){
 		File del=getTagFile();
@@ -243,4 +257,12 @@ public class Art {
 		}
 		return(rtn);
 	}	
+	
+	public void putLink(String s, MenuButton m){
+		linkButtonsMap.put(s,m);
+	}
+	
+	public void removeLink(String s, MenuButton m){
+		linkButtonsMap.remove(s, m);
+	}
 }

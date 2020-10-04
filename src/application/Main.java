@@ -39,7 +39,7 @@ public class Main extends Application{
 	
 	public void start(Stage stage) throws FileNotFoundException{
 		//Adding art
-		File[] addArt=new File("resource/Art").listFiles();
+		File[] addArt=new File("User Art/Art").listFiles();
 		for(File a:addArt){
 			allArt.add(new Art(a));
 		}
@@ -117,7 +117,7 @@ public class Main extends Application{
 					
 					try{
 						Files.copy(file.toPath(),
-								(new File("resource/ART/"+file.getName())).toPath(),
+								(new File("User Art/Art/"+file.getName())).toPath(),
 								StandardCopyOption.REPLACE_EXISTING);
 					}catch(IOException er){
 						System.out.println("IO Exception: "+er);
@@ -449,8 +449,9 @@ public class Main extends Application{
 						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
 						newWindow.setScene(newerScene);
+					}else{ 
+						art.removeTags(section, removeTags);
 					}
-					else{ art.removeTags(section, removeTags);}
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS",","));

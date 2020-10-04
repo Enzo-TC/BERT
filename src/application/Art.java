@@ -81,7 +81,7 @@ public class Art {
 		int spot=0;//Keeps track of the current row
 		try {
 			//Opening the CSV file
-			Reader in=new FileReader("resource/RSC/"+artName+".csv");
+			Reader in=new FileReader("User Art/CSV/"+artName+".csv");
 			Iterable<CSVRecord> records=CSVFormat.EXCEL
 					.parse(in);
 			//Reading the 4 data rows
@@ -112,6 +112,7 @@ public class Art {
 		//Make new file
 		}catch(FileNotFoundException e){
 			writeTagsToFile();
+			createMeta();
 		//Reading error
 		}catch(IOException e){
 			System.out.println(e);
@@ -122,7 +123,7 @@ public class Art {
 	public Image getImage(){
 		Image img=null;
 		try{
-			FileInputStream stream=new FileInputStream("resource/Art/"+fileName);
+			FileInputStream stream=new FileInputStream("User Art/Art/"+fileName);
 			img=new Image(stream);
 			stream.close();
 		}catch(FileNotFoundException e){
@@ -136,14 +137,14 @@ public class Art {
 	//Returns the file of the object's image
 	public File getArtFile(){
 		File img=null;
-		img=new File("resource/ART/"+fileName);
+		img=new File("User Art/Art/"+fileName);
 		return(img);
 	}
 	
 	//Returns the file of the object's tags
 	public File getTagFile(){
 		File rtn=null;
-		rtn=new File("resource/RSC/"+artName+".csv");
+		rtn=new File("User Art/CSV/"+artName+".csv");
 		return(rtn);
 	}
 	

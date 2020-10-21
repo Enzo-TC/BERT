@@ -3,6 +3,7 @@ package application;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -14,11 +15,15 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage; 
 
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.awt.Toolkit;
@@ -50,42 +55,58 @@ public class Main extends Application{
 	
 
 	
+	
 	//Main search page
-	public void startPage(Stage stage){
-		Pane layout=new Pane();
+	public void startPage(Stage stage){		
+		StackPane layout=new StackPane();
 		
 		//Tags-to-search text
 		Text tagsText=new Text("Tags:");
-		tagsText.setX(50);
-		tagsText.setY(100);
+		tagsText.setFill(Color.WHITE);
+		tagsText.getStyleClass().add("tagsText");
+		StackPane.setAlignment(tagsText,  Pos.TOP_LEFT);
+		tagsText.setTranslateX(20);
+		tagsText.setTranslateY(20);
 		
 		//Search box
 		TextField tagField=new TextField();
-		tagField.setLayoutX(50);
-		tagField.setLayoutY(120);
+		tagField.getStyleClass().add("tagField");
+		StackPane.setAlignment(tagField,  Pos.CENTER);
 		
 		//Search button
 		Button searchBtn=new Button("Search");
-		searchBtn.setLayoutX(50);
-		searchBtn.setLayoutY(300);
+		searchBtn.getStyleClass().add("blueButton");
+		StackPane.setAlignment(searchBtn,  Pos.CENTER_LEFT);
+		searchBtn.setTranslateX(20);
+		searchBtn.setTranslateY(40);
+		
+		//Help button
+		Button helpBtn=new Button("Help");
+		helpBtn.getStyleClass().add("blueButton");
+		StackPane.setAlignment(helpBtn, Pos.CENTER);
+		helpBtn.setTranslateX(-10);
+		helpBtn.setTranslateY(40);
 		
 		//Add new image button
 		Button addBtn=new Button("Add image");
-		addBtn.setLayoutX(50);
-		addBtn.setLayoutY(340);
+		addBtn.getStyleClass().add("blueButton");
+		StackPane.setAlignment(addBtn,  Pos.CENTER_RIGHT);
+		addBtn.setTranslateX(-20);
+		addBtn.setTranslateY(40);
 		
 		ScrollPane scrollPane=new ScrollPane();
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 		//scrollPane.setContent();
 		
 		//Returning buttons & field
-		layout.getChildren().addAll(tagsText,tagField,searchBtn,addBtn);		
+		layout.getChildren().addAll(tagsText,tagField,searchBtn,helpBtn,addBtn);		
 		
-		Scene scene = new Scene(layout, 240, 420);//Initializing scene
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		Scene scene = new Scene(layout, 280, 140);//Initializing scene
+		scene.getStylesheets().add(getClass().getResource("start.css").toExternalForm());
 		stage.setTitle("Sina");
 		stage.setScene(scene);
 		stage.show();
+		
 		
 		//When search button is pressed
 		searchBtn.setOnAction(new EventHandler<ActionEvent>(){
@@ -97,6 +118,13 @@ public class Main extends Application{
 				
 				//New window with art results
 				imageSearch(stage,searchTags);
+			}
+		});
+		
+		//Bring up help menu
+		helpBtn.setOnAction(new EventHandler<ActionEvent>(){
+			@Override public void handle(ActionEvent e){
+				System.out.println("There's no help here.");
 			}
 		});
 		
@@ -130,6 +158,8 @@ public class Main extends Application{
 	
 	
 	
+	
+	//Gallery of images section
 	public void imageSearch(Stage stage, String[] searchTags){
 		//New window
 		Pane tempPane=new Pane();
@@ -144,19 +174,24 @@ public class Main extends Application{
 		Button[] imageButton=new Button[displayImages.size()];
 		
 		for(int n=displayImages.size()-1;n>=0;n--){
-			imageViews[n]=new ImageView(displayImages.get(n).getImage());
-			
-			imageViews[n].setPreserveRatio(true);  
-			imageViews[n].setFitWidth(300); 
+			//Getting cropped preview for image
+			imageViews[n]=new ImageView(getCroppedImage(displayImages.get(n).getImage()));
+	
+			//Scaling image
+			imageViews[n].setPreserveRatio(true);
+			imageViews[n].setFitWidth(300);
 			imageViews[n].setFitHeight(300);
 			
+			//Adding image to button
 			imageButton[n]=new Button("",imageViews[n]);
 			imageButton[n].getStyleClass().add("art-button");
-			imageButton[n].setLayoutX(300*(n%3));
-			imageButton[n].setLayoutY(300*(n/3));
+			
+			//Positioning button
+			imageButton[n].setLayoutX((300*(n%3))-8);
+			imageButton[n].setLayoutY(300*(n/3)-8);
 			
 			//Setting up scrollpane
-			tempPane.getChildren().add(imageButton[n]);
+			tempPane.getChildren().add(imageButton[n]);			
 			newPane.setContent(tempPane);
 			
 			imageButton[n].setOnAction(new EventHandler<ActionEvent>(){
@@ -167,7 +202,7 @@ public class Main extends Application{
 		}
 		
 		Scene newScene=new Scene(newPane,900,900);
-		newScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		newScene.getStylesheets().add(getClass().getResource("images.css").toExternalForm());
 		
 		Stage newWindow=new Stage();
 		newWindow.setTitle(Arrays.toString(searchTags));
@@ -197,6 +232,20 @@ public class Main extends Application{
 		return(rtn);
 	}
 	
+	public WritableImage getCroppedImage(Image img){
+		PixelReader reader=img.getPixelReader();
+		
+		int scale;
+		if(img.getWidth()>img.getHeight()){//Wide image
+			scale=(int) img.getHeight();
+		}else{//Tall image
+			scale=(int) img.getWidth();
+		}
+		WritableImage rtn=new WritableImage(reader,(int) ((img.getWidth()-scale)/2), (int) ((img.getHeight()-scale)/2), scale,scale);
+		return(rtn);
+	}
+	
+	
 	
 	
 	//Main detailed page
@@ -205,7 +254,7 @@ public class Main extends Application{
 		Stage newWindow=new Stage();
 		Pane newPane = getPaneForArt(art, newWindow);
 		Scene newScene=new Scene(newPane,1800,800);
-		newScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		newScene.getStylesheets().add(getClass().getResource("detailed.css").toExternalForm());
 
 		newWindow.setTitle(art.getArtName());
 		newWindow.setScene(newScene);
@@ -269,9 +318,6 @@ public class Main extends Application{
 		}
 	}
 	
-	public static void main(String[] args){
-		launch(args);
-	}
 
 	//Seperating this part of the code as a function lets me call the code inside the function
 	//See -> how the page is updated in addBtn.setOnAction and removeBtn.setOnAction
@@ -471,5 +517,9 @@ public class Main extends Application{
 			}
 		});
 		return newPane;
+	}
+	
+	public static void main(String[] args){
+		launch(args);
 	}
 }

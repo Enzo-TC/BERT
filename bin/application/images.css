@@ -1,0 +1,11 @@
+.root{
+	-fx-background-color: #121212;
+}
+
+.art-button{
+	-fx-background-color: transparent;
+}
+
+StackPane{
+	-fx-alignment:center;
+}

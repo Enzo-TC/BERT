@@ -75,6 +75,26 @@ public class Art {
 		return(linkButtonsMap);
 	}
 	
+	//Returns the number of tags the specific section of an art object has
+	public int getNumTags(String section){
+		int rtn=-1;
+		switch(section){
+		case("ARTISTS"):
+			rtn=artistTags.size();
+			break;
+		case("LINKS"):
+			rtn=linkTags.size();
+			break;
+		case("TAGS"):
+			rtn=tagTags.size();
+			break;
+		case("META"):
+			rtn=metaTags.size();
+			break;
+		}
+		return(rtn);
+	}
+	
 	//Returns a tree set of the tags in the art's 'section' file
 	public void getTags(){
 		//Get tags for an image
@@ -169,7 +189,7 @@ public class Art {
 		try {
 			Dimension d=(getImageDimension(fl));
 			res="Image Size: "+(int)d.getWidth()+"x"+(int)d.getHeight();
-			aspect="Aspect Ratio: "+getAspect(d);
+			aspect="Aspect Ratio: "+getAspect()[0]+":"+getAspect()[1];
 		}catch(IOException e){
 			System.out.println(e);
 		}
@@ -209,17 +229,23 @@ public class Art {
 		throw new IOException("Not a known image file: " + imgFile.getAbsolutePath());
 	}
 	
-	public String getAspect(Dimension d){
-		double aspX,aspY;
-		int rat=1;
-		//While the ratio ends up creating a decimal
-		while((d.getHeight()*rat)%d.getWidth()!=0){
-			rat+=1;
+	public int[] getAspect(){
+		try{
+			Dimension d=(getImageDimension(fl));
+			double aspX,aspY;
+			int rat=1;
+			//While the ratio ends up creating a decimal
+			while((d.getHeight()*rat)%d.getWidth()!=0){
+				rat+=1;
+			}
+			aspX=rat;
+			aspY=((d.getHeight()*rat)/d.getWidth());
+			int[] rtn={(int)aspX, (int)aspY};
+			return(rtn);
+		}catch(IOException e){
+			System.out.println("OwO"+e);
+			return(null);
 		}
-		aspX=rat;
-		aspY=((d.getHeight()*rat)/d.getWidth());
-		String rtn=(int)aspX+":"+(int)aspY;
-		return(rtn);
 	}
 	
 	//Adding tags to section file
@@ -311,10 +337,10 @@ public class Art {
 	public void writeTagsToFile(){
 		try(PrintWriter writer = new PrintWriter(getTagFile())){
 			StringBuilder rtn=new StringBuilder();
-			rtn.append(formatTags(artistTags,",")+"\n");
-			rtn.append(formatTags(linkTags,",")+"\n");
-			rtn.append(formatTags(tagTags,",")+"\n");
-			rtn.append(formatTags(metaTags,","));
+			rtn.append(formatTags(artistTags,",","")+"\n");
+			rtn.append(formatTags(linkTags,",","")+"\n");
+			rtn.append(formatTags(tagTags,",","")+"\n");
+			rtn.append(formatTags(metaTags,",",""));
 			writer.write(rtn.toString());
 			writer.close();
 		}catch(FileNotFoundException e){
@@ -324,25 +350,26 @@ public class Art {
 	
 	//Returns formated tags for the section
 	public String displayTags(String section,String split){
+		String start="  ";
 		switch(section){
 		case("ARTISTS"):
-			return(formatTags(artistTags,split));
+			return(formatTags(artistTags,split,start));
 		case("LINKS"):
-			return(formatTags(linkTags,split));
+			return(formatTags(linkTags,split,""));
 		case("TAGS"):
-			return(formatTags(tagTags,split));
+			return(formatTags(tagTags,split,start));
 		case("META"):
-			return(formatTags(metaTags,split));
+			return(formatTags(metaTags,split,start));
 		}
 		return("");
 	}
 	
 	//Returns a nice looking list of tags in string form
-	public String formatTags(TreeSet<String> tags,String split){
+	public String formatTags(TreeSet<String> tags,String split,String start){
 		Iterator<String> tIterator=tags.iterator();
 		String rtn="";
 		while(tIterator.hasNext()){
-			rtn+=tIterator.next();
+			rtn+=start+tIterator.next();
 			if(tIterator.hasNext())
 				rtn+=split;
 		}
@@ -350,16 +377,16 @@ public class Art {
 	}	
 	
 	//Returns a nice looking list of tags in string form
-		public String formatTags(LinkedHashSet<String> tags,String split){
-			Iterator<String> tIterator=tags.iterator();
-			String rtn="";
-			while(tIterator.hasNext()){
-				rtn+=tIterator.next();
-				if(tIterator.hasNext())
-					rtn+=split;
-			}
-			return(rtn);
-		}	
+	public String formatTags(LinkedHashSet<String> tags,String split,String start){
+		Iterator<String> tIterator=tags.iterator();
+		String rtn="";
+		while(tIterator.hasNext()){
+			rtn+=start+tIterator.next();
+			if(tIterator.hasNext())
+				rtn+=split;
+		}
+		return(rtn);
+	}	
 	
 	public void putLink(String s, MenuButton m){
 		linkButtonsMap.put(s,m);

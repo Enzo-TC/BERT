@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -124,7 +125,7 @@ public class Main extends Application{
 		//Bring up help menu
 		helpBtn.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
-				System.out.println("There's no help here.");
+				helpMenu();
 			}
 		});
 		
@@ -154,6 +155,24 @@ public class Main extends Application{
 				}
 			}
 		});
+	}
+	
+	
+	
+	
+	//Bringing up the help menu
+	public void helpMenu(){
+		//New window
+		Pane helpPane=new Pane();
+		
+		Scene newScene=new Scene(helpPane,400,500);
+		newScene.getStylesheets().add(getClass().getResource("images.css").toExternalForm());
+		
+		Stage newWindow=new Stage();
+		newWindow.setTitle("Help");
+		newWindow.setScene(newScene);
+		
+		newWindow.show();
 	}
 	
 	
@@ -252,8 +271,13 @@ public class Main extends Application{
 	public void bigImage(Stage stage, Art art){
 		//Creating new window
 		Stage newWindow=new Stage();
-		Pane newPane = getPaneForArt(art, newWindow);
-		Scene newScene=new Scene(newPane,1800,800);
+		//How much space image takes up
+		int[] imgDim=getDetailImageSize(art);
+		//How much space tags take up
+		int tagDim=getTagSize(art);
+		Pane newPane = getPaneForArt(art, newWindow, imgDim, tagDim);
+		
+		Scene newScene=new Scene(newPane,imgDim[0]+tagDim,imgDim[1]);
 		newScene.getStylesheets().add(getClass().getResource("detailed.css").toExternalForm());
 
 		newWindow.setTitle(art.getArtName());
@@ -277,6 +301,7 @@ public class Main extends Application{
 					//Getting each tag
 					//sections is declared final so it can be used on button press
 					final String[] sections=tags[n].split("]");
+					//
 					sections[0]=sections[0].substring(1);
 					
 					FileInputStream stream=new FileInputStream("resource/LNK/"+sections[0]+".png");
@@ -294,7 +319,7 @@ public class Main extends Application{
 					
 					rtn[n]=new MenuButton("",linkView);
 					rtn[n].getStyleClass().add("link-button");
-					rtn[n].setLayoutX(1020+(80*n));
+					rtn[n].setLayoutX(1020+(65*n));
 					rtn[n].setLayoutY(75);
 					rtn[n].getItems().setAll(menuRtn);
 
@@ -321,7 +346,7 @@ public class Main extends Application{
 
 	//Seperating this part of the code as a function lets me call the code inside the function
 	//See -> how the page is updated in addBtn.setOnAction and removeBtn.setOnAction
-	public Pane getPaneForArt(Art art, Stage newWindow){
+	public Pane getPaneForArt(Art art, Stage newWindow, int[] imgDimensions, int tagDimensions){
 		//New window
 		Pane newPane=new Pane();
 		//Getting the image itself
@@ -343,73 +368,99 @@ public class Main extends Application{
 		}else{
 			//Error text
 			Text imageError=new Text("It seems this file type isn't supported.\nPlease spam EnzoTC#2358 with this message and your image.");
-			imageError.setX(350);
-			imageError.setY(380);
+			imageError.setX(0);
+			imageError.setY(imgDimensions[1]/2);
 			newPane.getChildren().add(imageError);
 		}
 
 		//Getting the tags for the image
 		Text artists=new Text("Artist(s):\n"+art.displayTags("ARTISTS",","));
-		artists.setX(1020);
+		artists.getStyleClass().add("tagsText");
+		artists.setFill(Color.WHITE);
+		artists.setWrappingWidth(tagDimensions-12);
+		artists.setX(imgDimensions[0]+10);
 		artists.setY(20);
 
 		Text links=new Text("Link(s):\n");
-		links.setX(1020);
+		links.getStyleClass().add("tagsText");
+		links.setFill(Color.WHITE);
+		links.setX(imgDimensions[0]+10);
 		links.setY(60);
 		//Buttons for web links
 		setupButtonLinks(art);
 		newPane.getChildren().addAll(art.getLinkBtnMap().values());
 		
-		Text tags=new Text("Tags(s):\n"+art.displayTags("TAGS",","));
-		tags.setX(1020);
+		Text tags=new Text("Tags(s):\n");
+		tags.setFill(Color.WHITE);
+		tags.setWrappingWidth(tagDimensions-12);
+		tags.setX(imgDimensions[0]+10);
 		tags.setY(140);
+		
+		ScrollPane tagsScroll=new ScrollPane();
+		tagsScroll.getStyleClass().add("scroll-pane");
+		tagsScroll.setMaxHeight(360);
+		tagsScroll.setLayoutX(imgDimensions[0]+20);
+		tagsScroll.setLayoutY(150);
+		tagsScroll.setContent(new Text(art.displayTags("TAGS",",\n")));
 
 		Text meta=new Text("Meta:\n"+art.displayTags("META","\n"));
-		meta.setX(1020);
-		meta.setY(180);
+		meta.getStyleClass().add("tagsText");
+		meta.setFill(Color.WHITE);
+		meta.setX(imgDimensions[0]+10);
+		meta.setY(540);
 
 		//Returning tags
-		newPane.getChildren().addAll(artists,links,tags,meta);
-
+		newPane.getChildren().addAll(artists,links,tags,tagsScroll,meta);
+		
+		
 		//Setting up the drop-down menu for different tags
-		ChoiceBox<String> tagBox=new ChoiceBox<String>();
+		ChoiceBox<String> tagBox=new ChoiceBox<>();
+		tagBox.getStyleClass().add("choiceBox");
 		tagBox.getItems().addAll("Artists","Links","Tags","Meta");
 		tagBox.setValue("Tags");
-		tagBox.setLayoutX(1020);
-		tagBox.setLayoutY(700);
+		tagBox.setTooltip(new Tooltip("Select the type of tag"));
+		tagBox.setLayoutX(imgDimensions[0]+10);
+		tagBox.setLayoutY(imgDimensions[1]-90);
 
 		//Setting up the drop-down menu for websites
 		ChoiceBox<String> webBox=new ChoiceBox<String>();
+		webBox.getStyleClass().add("choiceBox");
 		webBox.getItems().addAll("Deviant Art","E926","Fur Affinity","Inkbunny","SoFurry","Tumblr","Twitter","Weasyl");
 		webBox.setValue("Fur Affinity");
-		webBox.setLayoutX(1100);
-		webBox.setLayoutY(700);
-
+		tagBox.setTooltip(new Tooltip("Select the website for links"));
+		webBox.setLayoutX(imgDimensions[0]+90);
+		webBox.setLayoutY(imgDimensions[1]-90);
+		
 		//Returning the drop-down
 		newPane.getChildren().addAll(tagBox,webBox);
-
+		
 		//Setting up the text field for tags
 		TextField tagField=new TextField("Enter tag(s) here");
-		tagField.setLayoutX(1020);
-		tagField.setLayoutY(730);
+		tagField.getStyleClass().add("tagField");
+		tagField.setLayoutX(imgDimensions[0]-10);
+		tagField.setLayoutY(imgDimensions[1]-76);
 
 		//Setting up the add and remove buttons for tags
 		Button addBtn=new Button("Add");
-		addBtn.setLayoutX(1020);
-		addBtn.setLayoutY(760);
+		addBtn.getStyleClass().add("blueButton");
+		addBtn.setLayoutX(imgDimensions[0]+10);
+		addBtn.setLayoutY(imgDimensions[1]-30);
 
 		Button removeBtn=new Button("Remove");
-		removeBtn.setLayoutX(1100);
-		removeBtn.setLayoutY(760);
+		removeBtn.getStyleClass().add("blueButton");
+		removeBtn.setLayoutX(imgDimensions[0]+60);
+		removeBtn.setLayoutY(imgDimensions[1]-30);
 
 		//Setting up the button for deleting an image
 		Button deleteBtn=new Button("Delete image");
-		deleteBtn.setLayoutX(1200);
-		deleteBtn.setLayoutY(760);
+		deleteBtn.getStyleClass().add("deleteButton");		
+		deleteBtn.setLayoutX(imgDimensions[0]+130);
+		deleteBtn.setLayoutY(imgDimensions[1]-30);
 
 		//Returning the tag buttons and field
 		newPane.getChildren().addAll(tagField,addBtn,removeBtn,deleteBtn);
 
+		
 		//When add button is pressed, adding tags
 		addBtn.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
@@ -439,7 +490,7 @@ public class Main extends Application{
 						//Letting bigImage make it's own Pane then trying to copy it in here would result in an IllegalArgumntException
 						//Because of some duplicating issue? idk
 						//Seperating the code that makes the pane then using it as a function to get a replica fixes the bug.
-						Pane p = getPaneForArt(art, newWindow);
+						Pane p = getPaneForArt(art, newWindow, imgDimensions, tagDimensions);
 						//Now we can update the window without having to close and reopen it!
 						Scene newerScene=new Scene(p,1800,800);
 						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -452,7 +503,7 @@ public class Main extends Application{
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS",","));
-					tags.setText("Tags(s):\n"+art.displayTags("TAGS",","));
+					tagsScroll.setContent(new Text(art.displayTags("TAGS",",\n")));
 					meta.setText("Meta:\n"+art.displayTags("META","\n"));
 				}
 				//Clearing tag entry box
@@ -478,7 +529,7 @@ public class Main extends Application{
 
 						//Removes Link buttons from the window
 
-						Pane p = getPaneForArt(art, newWindow);
+						Pane p = getPaneForArt(art, newWindow, imgDimensions, tagDimensions);
 						//Updates the Pairing map.
 						for(int n=0;n<removeTags.length;n++) {
 							if (art.linkMapContains(removeTags[n])) {
@@ -501,7 +552,7 @@ public class Main extends Application{
 
 					//Updating text
 					artists.setText("Artist(s):\n"+art.displayTags("ARTISTS",","));
-					tags.setText("Tags(s):\n"+art.displayTags("TAGS",","));
+					tagsScroll.setContent(new Text(art.displayTags("TAGS",",\n")));
 					meta.setText("Meta:\n"+art.displayTags("META","\n"));
 				}
 				//Clearing tag entry box
@@ -516,8 +567,37 @@ public class Main extends Application{
 				allArt.remove(art);
 			}
 		});
-		return newPane;
+		return(newPane);
 	}
+	
+	//Returns the optimal dimensions for the big image scene based on the aspect ratio of art being displayed
+	public int[] getDetailImageSize(Art a){
+		//Art max is 1000x800, 5:4
+		int[] rtn=new int[2];
+		//Getting ratio of image
+		int[] aspects=a.getAspect();
+		float ratio=(float)aspects[1]/(float)aspects[0];
+		
+		if(ratio<0.8){//Image is wide
+			rtn[0]=1000;
+			rtn[1]=(int)(ratio*1000);
+		}else{//Image is tall
+			rtn[1]=800;
+			rtn[0]=(int)(800/ratio);
+		}
+		return(rtn);
+	}
+	
+	//Returns the amount of space to be allocated to the tags
+	public int getTagSize(Art a){
+		int numLinks=a.getNumTags("LINKS");
+		if(numLinks<3)
+			return(240);
+		return(numLinks*80);
+	}
+	
+	
+	
 	
 	public static void main(String[] args){
 		launch(args);

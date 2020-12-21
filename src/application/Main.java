@@ -168,15 +168,15 @@ public class Main extends Application{
 		
 		Text helpText=new Text("Welcome to Sina Sees, your own personal image gallery tool! "
 				+ "\nTo get started, switch back to the starting tab and enter in tags that you want your art gallery to have. "
-				+ "Use spaces to separate different tags and use underscore '_' for multi_word tags. "
+				+ "\nUse spaces to separate different tags and use underscore '_' for multi_word tags. "
 				+ "ex: \"dog red_hair solo simple_background\""
 				+ "\nUse 'Add Image' to add another image to the program."
 				+ "\nAfter searching, feel free to scroll around the newly created image gallery."
-				+ "Click on an image to open up a detailed view of it and see its tags."
+				+ "\nClick on an image to open up a detailed view of it and see its tags."
 				+ "\nHere you can see its tags and their categories. For links you can click on their specific icons and copy their links."
-				+ "To add or remove tags enter them into the tag box, using the same system as for searching, then select the tag category;"
+				+ "\nTo add or remove tags enter them into the tag box, using the same system as for searching, then select the tag category;"
 				+ "\nif adding a link make sure to specify which site it's from using the 2nd drop down menu."
-				+ "Use the red 'Delete Image' button to permanently remove the image from the program.");
+				+ "\nUse the red 'Delete Image' button to permanently remove the image from the program.");
 		helpText.setFill(Color.WHITE);
 		helpText.setFont(new Font("Arial", 20));
 		helpText.wrappingWidthProperty().bind(helpPane.widthProperty());
@@ -184,7 +184,7 @@ public class Main extends Application{
 		
 		StackPane.setAlignment(helpText, Pos.TOP_LEFT);
 		
-		Scene newScene=new Scene(helpPane,1240,400);
+		Scene newScene=new Scene(helpPane,1120,260);
 		newScene.getStylesheets().add(getClass().getResource("images.css").toExternalForm());
 		
 		Stage newWindow=new Stage();

@@ -1,12 +1,16 @@
-<<<<<<< HEAD
 package application;
 
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -20,8 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage; 
-
+import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -38,12 +41,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Main extends Application{
-
+public class Main extends Application{	
+	private ArrayList<Art> smallImg;
+	
 	private ArrayList<Art> allArt=new ArrayList<Art>();
 	//There was an issue with random Buttons other than link disappearing when trying to remove a link button
 	//By pairing each link button with it's link the program can filter the buttons that are going to be removed
-	
 	
 	public void start(Stage stage) throws FileNotFoundException{
 		//Adding art
@@ -51,12 +54,12 @@ public class Main extends Application{
 		for(File a:addArt){
 			allArt.add(new Art(a));
 		}
-			
+		
 		//Starting search page
 		startPage(stage);
 	}
 	
-
+	
 	
 	
 	//Main search page
@@ -106,7 +109,7 @@ public class Main extends Application{
 		
 		Scene scene = new Scene(layout, 280, 140);//Initializing scene
 		scene.getStylesheets().add(getClass().getResource("start.css").toExternalForm());
-		stage.setTitle("Sina");
+		stage.setTitle("Brackets' Base");
 		stage.setScene(scene);
 		stage.show();
 		
@@ -167,7 +170,7 @@ public class Main extends Application{
 		//New window
 		StackPane helpPane=new StackPane();
 		
-		Text helpText=new Text("Welcome to Sina Sees, your own personal image gallery tool! "
+		Text helpText=new Text("Welcome to Brackets' Base, your own personal image gallery tool! "
 				+ "\nTo get started, switch back to the starting tab and enter in tags that you want your art gallery to have. "
 				+ "\nUse spaces to separate different tags and use underscore '_' for multi_word tags. "
 				+ "ex: \"dog red_hair solo simple_background\""
@@ -176,7 +179,7 @@ public class Main extends Application{
 				+ "\nClick on an image to open up a detailed view of it and see its tags."
 				+ "\nHere you can see its tags and their categories. For links you can click on their specific icons and copy their links."
 				+ "\nTo add or remove tags enter them into the tag box, using the same system as for searching, then select the tag category;"
-				+ "\nif adding a link make sure to specify which site it's from using the 2nd drop down menu."
+				+ "\nIf you're adding a link, make sure to specify which website icon it should use via the menu to the right of the tags menu."
 				+ "\nUse the red 'Delete Image' button to permanently remove the image from the program.");
 		helpText.setFill(Color.WHITE);
 		helpText.setFont(new Font("Arial", 20));
@@ -200,14 +203,18 @@ public class Main extends Application{
 	
 	//Gallery of images section
 	public void imageSearch(Stage stage, String[] searchTags){
+		
 		//New window
 		Pane tempPane=new Pane();
 		ScrollPane newPane=new ScrollPane();
 		//Disabling vertical scrolling
 		newPane.setFitToWidth(true);
 		
-		//Adding the new images				
-		ArrayList<Art> displayImages=getSmallImages(searchTags);
+		//Adding the new images
+		ArrayList<Art> displayImages;
+		getSmallImages(searchTags);
+		displayImages=smallImg;
+		
 		ImageView[] imageViews=new ImageView[displayImages.size()];
 		
 		Button[] imageButton=new Button[displayImages.size()];
@@ -235,7 +242,8 @@ public class Main extends Application{
 			
 			imageButton[n].setOnAction(new EventHandler<ActionEvent>(){
 				@Override public void handle(ActionEvent e){
-					bigImage(stage,displayImages.get(findArtButton(e.getSource(),imageButton)));
+					Art test=(displayImages.get(findArtButton(e.getSource(),imageButton)));
+					bigImage(stage,test);
 				}
 			});
 		}
@@ -260,15 +268,15 @@ public class Main extends Application{
 	}
 		
 	//Returns an array list of the images matching the search tags
-	public ArrayList<Art> getSmallImages(String[] searchTags){
-		ArrayList<Art> rtn=new ArrayList<Art>();
+	public void getSmallImages(String[] searchTags){
+		smallImg=new ArrayList<Art>();
 		for(Art a:allArt){
 			//If search tags are empty, all art shows up
 			if(searchTags[0].equals("") || a.hasTags(searchTags)){
-				rtn.add(a);
+				//Duplicate and add art
+				smallImg.add(a);
 			}
 		}
-		return(rtn);
 	}
 	
 	public WritableImage getCroppedImage(Image img){
@@ -450,6 +458,7 @@ public class Main extends Application{
 		tagBox.setTooltip(new Tooltip("Select the website for links"));
 		webBox.setLayoutX(imgDimensions[0]+90);
 		webBox.setLayoutY(imgDimensions[1]-90);
+		webBox.setVisible(false);
 		
 		//Returning the drop-down
 		newPane.getChildren().addAll(tagBox,webBox);
@@ -472,14 +481,24 @@ public class Main extends Application{
 		removeBtn.setLayoutY(imgDimensions[1]-30);
 
 		//Setting up the button for deleting an image
-		Button deleteBtn=new Button("Delete image");
-		deleteBtn.getStyleClass().add("deleteButton");		
-		deleteBtn.setLayoutX(imgDimensions[0]+130);
-		deleteBtn.setLayoutY(imgDimensions[1]-30);
+		Button deleteImgBtn=new Button("Delete image");
+		deleteImgBtn.getStyleClass().add("deleteButton");		
+		deleteImgBtn.setLayoutX(imgDimensions[0]+130);
+		deleteImgBtn.setLayoutY(imgDimensions[1]-30);
 
 		//Returning the tag buttons and field
-		newPane.getChildren().addAll(tagField,addBtn,removeBtn,deleteBtn);
+		newPane.getChildren().addAll(tagField,addBtn,removeBtn,deleteImgBtn);
 
+		//Hides/shows that website choicebox for helping make tagging easier to understand
+		tagBox.getSelectionModel().selectedIndexProperty().addListener(
+		         (ObservableValue<? extends Number> ov, Number oldVal, Number newVal) -> {
+		             if(newVal.intValue()==1){
+		            	 webBox.setVisible(true);
+		             }else{
+		            	 webBox.setVisible(false);
+		             }
+		       });
+		
 		
 		//When add button is pressed, adding tags
 		addBtn.setOnAction(new EventHandler<ActionEvent>(){
@@ -513,7 +532,7 @@ public class Main extends Application{
 						Pane p = getPaneForArt(art, newWindow, imgDimensions, tagDimensions);
 						//Now we can update the window without having to close and reopen it!
 						Scene newerScene=new Scene(p,1800,800);
-						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+						newerScene.getStylesheets().add(getClass().getResource("detailed.css").toExternalForm());
 
 						newWindow.setScene(newerScene);
 					}else{
@@ -563,7 +582,7 @@ public class Main extends Application{
 							}
 						}
 						Scene newerScene=new Scene(p,1800,800);
-						newerScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+						newerScene.getStylesheets().add(getClass().getResource("detailed.css").toExternalForm());
 
 						newWindow.setScene(newerScene);
 					}else{ 
@@ -581,10 +600,25 @@ public class Main extends Application{
 		});
 
 		//When delete button is pressed
-		deleteBtn.setOnAction(new EventHandler<ActionEvent>(){
+		deleteImgBtn.setOnAction(new EventHandler<ActionEvent>(){
 			@Override public void handle(ActionEvent e){
-				art.deleteImage();
-				allArt.remove(art);
+				/*Custom buttons for alert*/
+				ButtonType confirmDeletion = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
+				ButtonType cancelDeletion = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+				
+				/*Alert used to confirm deletion*/
+				Alert alert = new Alert(AlertType.CONFIRMATION,"There is no way to undo this action.",confirmDeletion,cancelDeletion);
+				alert.setTitle("Confirm Deletion");
+				alert.setHeaderText("Are you sure you want to permanently delete "+art.getArtName()+"?");
+				alert.showAndWait();
+				
+				if (alert.getResult() == confirmDeletion) {
+					newWindow.hide();
+					allArt.remove(art);
+					
+					art.deleteImage();
+				}
+				
 			}
 		});
 		return(newPane);

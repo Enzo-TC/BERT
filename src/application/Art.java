@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -154,6 +155,13 @@ public class Art {
 		return(img);
 	}
 	
+	//Returns the path of the object's image
+	public Path getArtPath(){
+		Path img=null;
+		img=Paths.get("User Art/Art/"+fileName);
+		return(img);
+	}
+	
 	//Returns the file of the object's image
 	public File getArtFile(){
 		File img=null;
@@ -219,6 +227,7 @@ public class Art {
 				reader.setInput(stream);
 				int width = reader.getWidth(reader.getMinIndex());
 				int height = reader.getHeight(reader.getMinIndex());
+				stream.close();
 				return new Dimension(width, height);
 			} catch (IOException e) {
 				System.out.println("Error reading: " + imgFile.getAbsolutePath()+"\n"+e);
@@ -327,10 +336,14 @@ public class Art {
 	
 	//Removes the image and files from 
 	public void deleteImage(){
-		File del=getTagFile();
-		del.delete();
-		del=getArtFile();
-		del.delete();
+		File delTag=getTagFile();
+		delTag.delete();
+		Path delArt=getArtPath();
+		try{
+			Files.delete(delArt);
+		}catch(IOException e){
+			System.out.println(e);
+		}
 	}
 	
 	//Writes the tags back to the CSV file

@@ -179,37 +179,34 @@ public class Art {
 	//Creating the meta tags for when an image is initially added
 	public void createMeta(){
 		//Data to add
-		String[] rtn=new String[6];
+		String[] rtn=new String[5];
 		
 		//Day added
-		String day,time;
+		String day;
 		SimpleDateFormat dayFormat=new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat timeFormat=new SimpleDateFormat("HH:mm");
 		Date date = new Date(System.currentTimeMillis());
-		time="Time Added: "+timeFormat.format(date);
-		day="Day Added: "+dayFormat.format(date);
-		rtn[0]=time;
-		rtn[1]=day;
+		day="Day_Added:"+dayFormat.format(date);
+		rtn[0]=day;
 		
 		//Image size and aspect ratio
 		String res="";
 		String aspect="";
 		try {
 			Dimension d=(getImageDimension(fl));
-			res="Image Size: "+(int)d.getWidth()+"x"+(int)d.getHeight();
-			aspect="Aspect Ratio: "+getAspect()[0]+":"+getAspect()[1];
+			res="Image_Size:"+(int)d.getWidth()+"x"+(int)d.getHeight();
+			aspect="Aspect_Ratio:"+getAspect()[0]+":"+getAspect()[1];
 		}catch(IOException e){
 			System.out.println(e);
 		}
-		rtn[2]=res;
-		rtn[3]=aspect;
+		rtn[1]=res;
+		rtn[2]=aspect;
 		
 		//File size and type
 		String flSize,flType;
-		flSize="File Size: "+fl.length()+" bytes";
-		flType="File Type: ."+fileType;
-		rtn[4]=flSize;
-		rtn[5]=flType;
+		flSize="File_Size:"+fl.length()+" bytes";
+		flType="File_Type:."+fileType;
+		rtn[3]=flSize;
+		rtn[4]=flType;
 		
 		addTags("META",rtn);
 	}
@@ -310,9 +307,16 @@ public class Art {
 	
 	//Checks if an array of tags show up for the art
 	public boolean hasTags(String[] searchTags){
+		String tempTag;
 		for(String tag:searchTags){
-			if(!hasTag(tag))
+			//Blacklist tag
+			if(tag.split("")[0].equals("-")){
+				tempTag=tag.substring(0, 0) + tag.substring(1);
+				if(hasTag(tempTag))
+					return(false);
+			}else if(!hasTag(tag)){
 				return(false);
+			}
 		}
 		return(true);
 	}
@@ -381,10 +385,14 @@ public class Art {
 	public String formatTags(TreeSet<String> tags,String split,String start){
 		Iterator<String> tIterator=tags.iterator();
 		String rtn="";
+		String next;
 		while(tIterator.hasNext()){
-			rtn+=start+tIterator.next();
-			if(tIterator.hasNext())
-				rtn+=split;
+			next=tIterator.next();
+			if(!next.equals("")){
+				rtn+=start+next;
+				if(tIterator.hasNext())
+					rtn+=split;
+			}
 		}
 		return(rtn);
 	}	

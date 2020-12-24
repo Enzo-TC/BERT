@@ -109,7 +109,7 @@ public class Main extends Application{
 		
 		Scene scene = new Scene(layout, 280, 140);//Initializing scene
 		scene.getStylesheets().add(getClass().getResource("start.css").toExternalForm());
-		stage.setTitle("Brackets' Base");
+		stage.setTitle("BERT");
 		stage.setScene(scene);
 		stage.show();
 		
@@ -170,17 +170,12 @@ public class Main extends Application{
 		//New window
 		StackPane helpPane=new StackPane();
 		
-		Text helpText=new Text("Welcome to Brackets' Base, your own personal image gallery tool! "
+		Text helpText=new Text("Welcome to Bracket’s Exuberant Reference Tracker, your own personal image gallery tool! "
 				+ "\nTo get started, switch back to the starting tab and enter in tags that you want your art gallery to have. "
-				+ "\nUse spaces to separate different tags and use underscore '_' for multi_word tags. "
-				+ "ex: \"dog red_hair solo simple_background\""
-				+ "\nUse 'Add Image' to add another image to the program."
+				+ "\nDon't enter any tags if you want to see everything "
 				+ "\nAfter searching, feel free to scroll around the newly created image gallery."
 				+ "\nClick on an image to open up a detailed view of it and see its tags."
-				+ "\nHere you can see its tags and their categories. For links you can click on their specific icons and copy their links."
-				+ "\nTo add or remove tags enter them into the tag box, using the same system as for searching, then select the tag category;"
-				+ "\nIf you're adding a link, make sure to specify which website icon it should use via the menu to the right of the tags menu."
-				+ "\nUse the red 'Delete Image' button to permanently remove the image from the program.");
+				+ "\nHere you can see its tags and their categories. For links you can click on their specific icons and copy their links.");
 		helpText.setFill(Color.WHITE);
 		helpText.setFont(new Font("Arial", 20));
 		helpText.wrappingWidthProperty().bind(helpPane.widthProperty());
@@ -188,7 +183,7 @@ public class Main extends Application{
 		
 		StackPane.setAlignment(helpText, Pos.TOP_LEFT);
 		
-		Scene newScene=new Scene(helpPane,1120,260);
+		Scene newScene=new Scene(helpPane,1000,150);
 		newScene.getStylesheets().add(getClass().getResource("images.css").toExternalForm());
 		
 		Stage newWindow=new Stage();
@@ -315,7 +310,7 @@ public class Main extends Application{
 	}
 
 	//Adding link buttons to linkButtonsMap
-	public void setupButtonLinks(Art art){
+	public void setupButtonLinks(Art art,int[] dimensions){
 		//If links exist
 		if(!art.displayTags("LINKS",",").equals("")) {
 			String[] tags=art.displayTags("LINKS",",").split(",");
@@ -329,7 +324,7 @@ public class Main extends Application{
 					//Getting each tag
 					//sections is declared final so it can be used on button press
 					final String[] sections=tags[n].split("]");
-					//
+					
 					sections[0]=sections[0].substring(1);
 					
 					FileInputStream stream=new FileInputStream("resource/LNK/"+sections[0]+".png");
@@ -347,7 +342,7 @@ public class Main extends Application{
 					
 					rtn[n]=new MenuButton("",linkView);
 					rtn[n].getStyleClass().add("link-button");
-					rtn[n].setLayoutX(1020+(65*n));
+					rtn[n].setLayoutX(dimensions[0]+10+(65*n));
 					rtn[n].setLayoutY(75);
 					rtn[n].getItems().setAll(menuRtn);
 
@@ -415,7 +410,7 @@ public class Main extends Application{
 		links.setX(imgDimensions[0]+10);
 		links.setY(60);
 		//Buttons for web links
-		setupButtonLinks(art);
+		setupButtonLinks(art,imgDimensions);
 		newPane.getChildren().addAll(art.getLinkBtnMap().values());
 		
 		Text tags=new Text("Tags(s):\n");
@@ -435,7 +430,7 @@ public class Main extends Application{
 		meta.getStyleClass().add("tagsText");
 		meta.setFill(Color.WHITE);
 		meta.setX(imgDimensions[0]+10);
-		meta.setY(540);
+		meta.setY(imgDimensions[1]-200);
 
 		//Returning tags
 		newPane.getChildren().addAll(artists,links,tags,tagsScroll,meta);

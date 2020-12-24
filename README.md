@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Bracket’s Exuberant Reference Tracker
 Notices your README
 OwO What's this?
@@ -28,3 +29,6 @@ https://mega.nz/folder/uvQhRAIR
 SyBZWKYI2h8WLLwcwg5OoQ
 https://mega.nz/folder/umBw3YRA
 tuGGD1wmnS0eyKiE3AJmnA
+=======
+# Brackets-and-Enzos-Reference-Tracket
+>>>>>>> fa9f5eae5edb7cea88c719beac4f91500334dbde
